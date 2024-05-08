@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models, api
+from odoo import fields, models, api, exceptions
 
 class EstateProperty(models.Model):
     _name = "estate.property"
@@ -22,7 +22,7 @@ class EstateProperty(models.Model):
     garden_area = fields.Integer(string='Garden Area (sqm)')
     garden_orientation = fields.Selection(selection=[('north', 'North'),('east','East'),('south','South'),('west','West')],string='Garden Orientation')
     active = fields.Boolean(string="Active", default=True)
-    state = fields.Selection(selection=[('new', 'New'),('offerReceived', 'Offer Received'), ('offerAccepted', 'Offer Accepted'), ('sold', 'Sold'), ('canceled', 'Canceled')], default='new', copy=False, string='Status')
+    state = fields.Selection(readonly=True, selection=[('new', 'New'),('offerReceived', 'Offer Received'), ('offerAccepted', 'Offer Accepted'), ('sold', 'Sold'), ('canceled', 'Canceled')], default='new', copy=False, string='Status')
 
     property_type_id = fields.Many2one("estate.property.type", string="Property Type")
     buyer_id = fields.Many2one("res.partner", string="Buyer")
@@ -33,6 +33,7 @@ class EstateProperty(models.Model):
     total_area = fields.Integer(compute="_compute_area", readonly=True, string="Total Area (sqm)")
     best_price = fields.Float(compute="_compute_best_offer", readonly=True, string="Best Offer")
 
+    has_offer = fields.Boolean(string="Offer Accepted", readonly=True)
     @api.depends("living_area", "garden_area")
     def _compute_area(self):
         for record in self:
@@ -56,3 +57,16 @@ class EstateProperty(models.Model):
         else:
             self.garden_orientation = 'north'
             self.garden_area = 10
+
+    def action_sold(self):
+        for record in self:
+            if record.state == "canceled":
+                raise exceptions.UserError("Canceled properties cannot be sold")
+            else:
+                record.state = "sold"
+        return True
+
+    def action_cancel(self):
+        for record in self:
+            record.state = "canceled"
+        return True 

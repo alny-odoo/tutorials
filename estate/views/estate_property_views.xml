@@ -25,6 +25,10 @@
         <field name="model">estate.property</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <button name = "action_sold" type="object" string="Sold"></button>
+                    <button name = "action_cancel" type="object" string="Cancel"></button>
+                </header>
                 <sheet>
                     <h1>
                         <field name="name"></field>
@@ -32,7 +36,9 @@
                     <field name="tag_ids" widget="many2many_tags"/>
                     <group>
                         <group>
+                            <field name="state"></field>
                             <field name="postcode"></field>
+                            <field name="property_type_id"></field>
                             <field name="date_availability"></field>
                         </group>
                         <group>
@@ -51,7 +57,6 @@
                                     <field name="garden"></field>
                                     <field name="garden_area"></field>
                                     <field name="garden_orientation"></field>
-                                    <field name="property_type_id"></field>
                                     <field name="total_area"></field>
                                 </group>
                             </page>
@@ -60,9 +65,11 @@
                                     <tree editable="bottom">
                                         <field name="price"/>
                                         <field name="partner_id"/>
-                                        <field name="status"/>
                                         <field name="validity"></field>
                                         <field name="date_deadline"></field>
+                                        <button name="action_accept" type="object" string="" icon="fa-check"></button>
+                                        <button name="action_refuse" type="object" string="" icon="fa-times"></button>
+                                        <field name="state"/>
                                     </tree>
                                 </field>
                             </page>
