@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models, api, exceptions
+from odoo import fields, models, api, exceptions, tools
 
 class EstateProperty(models.Model):
     _name = "estate.property"
@@ -34,6 +34,7 @@ class EstateProperty(models.Model):
     best_price = fields.Float(compute="_compute_best_offer", readonly=True, string="Best Offer")
 
     has_offer = fields.Boolean(string="Offer Accepted", readonly=True)
+
     @api.depends("living_area", "garden_area")
     def _compute_area(self):
         for record in self:
@@ -70,3 +71,12 @@ class EstateProperty(models.Model):
         for record in self:
             record.state = "canceled"
         return True 
+
+    _sql_constraints = [('check_excpected_price_gte0', 'CHECK(expected_price >= 0)','The expected price has to be greater than 0'),
+    ('check_selling_price_gte0', 'CHECK(selling_price >= 0)','The selling price has to be greater than 0')]
+
+    @api.constrains('selling_price', 'expected_price')
+    def _check_selling_price(self):
+        for record in self:
+            if tools.float_compare(record.selling_price, 0.9*record.expected_price, 3) < 0 and not tools.float_is_zero(record.selling_price):
+                raise exceptions.ValidationError("The selling price is lower than 90%% of the expected price")
