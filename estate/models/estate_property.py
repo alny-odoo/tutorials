@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models
+from odoo import fields, models, api
 
 class EstateProperty(models.Model):
     _name = "estate.property"
@@ -29,3 +29,30 @@ class EstateProperty(models.Model):
     salesperson_id = fields.Many2one("res.users", string="Salesperson")
     tag_ids = fields.Many2many("estate.property.tag", string="Tags")
     offer_ids = fields.One2many("estate.property.offer","property_id" ,string="Offers")
+
+    total_area = fields.Integer(compute="_compute_area", readonly=True, string="Total Area (sqm)")
+    best_price = fields.Float(compute="_compute_best_offer", readonly=True, string="Best Offer")
+
+    @api.depends("living_area", "garden_area")
+    def _compute_area(self):
+        for record in self:
+            record.total_area = record.living_area + record.garden_area
+    
+
+    @api.depends("offer_ids.price")
+    def _compute_best_offer(self):
+        for record in self:
+            prices = record.mapped('offer_ids.price')
+            if prices:
+                record.best_price = max(prices)
+            else:
+                record.best_price = none
+
+    @api.onchange("garden")
+    def _onchange_garden(self):
+        if self.garden is False:
+            self.garden_orientation = None
+            self.garden_area = 0
+        else:
+            self.garden_orientation = 'north'
+            self.garden_area = 10
