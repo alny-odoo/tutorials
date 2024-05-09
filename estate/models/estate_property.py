@@ -6,8 +6,10 @@ from odoo import fields, models, api, exceptions, tools
 class EstateProperty(models.Model):
     _name = "estate.property"
     _description = "Estate Property"
-    #_order = "sequence"
+    _order = "property_type_id, id desc"
     
+
+
     name = fields.Char(string='Title', required=True)
     description = fields.Text(string='Description')
     postcode = fields.Char(string='Postcode')
@@ -34,7 +36,6 @@ class EstateProperty(models.Model):
     best_price = fields.Float(compute="_compute_best_offer", readonly=True, string="Best Offer")
 
     has_offer = fields.Boolean(string="Offer Accepted", readonly=True)
-
     @api.depends("living_area", "garden_area")
     def _compute_area(self):
         for record in self:
@@ -48,7 +49,7 @@ class EstateProperty(models.Model):
             if prices:
                 record.best_price = max(prices)
             else:
-                record.best_price = none
+                record.best_price = None
 
     @api.onchange("garden")
     def _onchange_garden(self):
@@ -71,6 +72,12 @@ class EstateProperty(models.Model):
         for record in self:
             record.state = "canceled"
         return True 
+        
+    # def button_visibility_handler(self):
+    #     for record in self:
+    #         if record.state in ("canceled", "sold"):
+    #             return True
+    #         return False
 
     _sql_constraints = [('check_excpected_price_gte0', 'CHECK(expected_price >= 0)','The expected price has to be greater than 0'),
     ('check_selling_price_gte0', 'CHECK(selling_price >= 0)','The selling price has to be greater than 0')]

@@ -5,13 +5,14 @@
         <field name="name">Estate Property Offer Action</field>
         <field name="res_model">estate.property.offer</field>
         <field name="view_mode">tree,form</field>
+        <field name="domain">[('property_type_id', '=', active_id)]</field>
     </record>
 
     <record id="estate_property_offer_view_tree" model="ir.ui.view">
         <field name="name">estate_property_offer.view.tree</field>
         <field name="model">estate.property.offer</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree editable="bottom">
                 <field name="price" ></field>
                 <field name="partner_id"></field>
                 <field name="state"></field>

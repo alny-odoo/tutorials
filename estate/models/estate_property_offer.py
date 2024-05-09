@@ -2,6 +2,8 @@ from odoo import fields, models, api, exceptions
 class EstatePropertyOffer(models.Model):
     _name = "estate.property.offer"
     _description = "Estate Property Offer"
+    _order = "price desc"
+    
 
     price = fields.Float(string="Price")
     state = fields.Selection(string="Status", selection=[("accepted", "Accepted"),("refused","Refused")], copy=False, readonly=True)
@@ -12,6 +14,7 @@ class EstatePropertyOffer(models.Model):
     validity = fields.Integer(string="Validity (days)", default=7)
     date_deadline = fields.Datetime(string="Deadline", compute="_compute_deadline_date", inverse="_inverse_deadline_date")
 
+    property_type_id = fields.Many2one('estate.property.type', related="property_id.property_type_id", name="Type", store=True)
     @api.depends("validity", "create_date")
     def _compute_deadline_date(self):
         for record in self:
