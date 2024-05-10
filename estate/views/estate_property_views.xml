@@ -76,9 +76,9 @@
                                         <field name="partner_id"/>
                                         <field name="validity"></field>
                                         <field name="date_deadline"></field>
-                                        <button name="action_accept" type="object" string="" icon="fa-check" invisible="state in ['accepted', 'refused']"></button>
-                                        <button name="action_refuse" type="object" string="" icon="fa-times" invisible="state in ['accepted', 'refused']"></button>
-                                        <field name="state" invisible="True"/>
+                                        <button name="action_accept" type="object" icon="fa-check"  string="Accept" invisible="state in ['accepted', 'refused']"></button>
+                                        <button name="action_refuse" type="object" icon="fa-times" string="Refuse" invisible="state in ['accepted', 'refused']"></button>
+                                        <field name="state" invisible="True" nolabel = "True"/>
                                     </tree>
                                 </field>
                             </page>

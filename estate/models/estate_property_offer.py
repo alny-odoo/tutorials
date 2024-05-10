@@ -41,6 +41,7 @@ class EstatePropertyOffer(models.Model):
         for record in self:
             if not record.property_id.has_offer:
                 record.state = "accepted"
+                record.property_id.state = "offerAccepted"
                 record.property_id.buyer_id = record.partner_id
                 record.property_id.selling_price = record.price
                 record.property_id.has_offer = True
