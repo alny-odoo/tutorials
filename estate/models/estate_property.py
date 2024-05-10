@@ -8,6 +8,12 @@ class EstateProperty(models.Model):
     _description = "Estate Property"
     _order = "property_type_id, id desc"
     
+    @api.ondelete(at_uninstall=False    )
+    def ondelete(self):
+        for record in self:
+            if record.state not in ['new', 'canceled']:
+                raise exceptions.UserError("Cannot delete records that are not new or canceled")
+            
 
 
     name = fields.Char(string='Title', required=True)
@@ -33,7 +39,7 @@ class EstateProperty(models.Model):
     offer_ids = fields.One2many("estate.property.offer","property_id" ,string="Offers")
 
     total_area = fields.Integer(compute="_compute_area", readonly=True, string="Total Area (sqm)")
-    best_price = fields.Float(compute="_compute_best_offer", readonly=True, string="Best Offer")
+    best_price = fields.Float(compute="_compute_best_offer", readonly=True, string="Best Offer", store=True)
 
     has_offer = fields.Boolean(string="Offer Accepted", readonly=True)
     @api.depends("living_area", "garden_area")

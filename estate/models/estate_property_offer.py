@@ -15,6 +15,16 @@ class EstatePropertyOffer(models.Model):
     date_deadline = fields.Datetime(string="Deadline", compute="_compute_deadline_date", inverse="_inverse_deadline_date")
 
     property_type_id = fields.Many2one('estate.property.type', related="property_id.property_type_id", name="Type", store=True)
+
+    @api.model_create_multi
+    def create(self, vals):
+        for value in vals:
+            if value["price"] <= self.env["estate.property"].browse(value["property_id"]).best_price:
+                raise exceptions.UserError("A higher offer already exists") 
+            self.env["estate.property"].browse(value["property_id"]).state = "offerReceived"
+        return super().create(vals)
+
+
     @api.depends("validity", "create_date")
     def _compute_deadline_date(self):
         for record in self:
